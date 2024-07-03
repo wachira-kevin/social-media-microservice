@@ -1,0 +1,19 @@
+{
+	"$schema": "https://www.krakend.io/schema/v3.json",
+	"version": 3,
+	"name": "CLUSTER GATEWAY",
+	"extra_config": {
+		"security/cors": {
+			"allow_origins": ["*"],
+			"allow_headers": ["*"],
+			"expose_headers": ["Content-Length", "Content-Type"],
+			"max_age": "12h",
+			"allow_methods": ["GET", "HEAD", "POST", "PUT", "DELETE"]
+		}
+	},
+	"timeout": "30000ms",
+	"cache_ttl": "300s",
+	"port": 9090,
+	"endpoints": [],
+	"output_encoding": "json"
+}
