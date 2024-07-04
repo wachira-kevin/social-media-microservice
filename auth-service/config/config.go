@@ -5,12 +5,11 @@ import (
 )
 
 type Config struct {
-	DatabaseURL   string
-	ServerPort    string
-	RedisAddr     string
-	RedisPassword string
-	RedisDB       int
-	RabbitMQURL   string
+	ServerPort           string
+	KeycloakURL          string
+	KeycloakRealm        string
+	KeycloakClientID     string
+	KeycloakClientSecret string
 }
 
 func LoadConfig() (*Config, error) {
@@ -22,6 +21,10 @@ func LoadConfig() (*Config, error) {
 	// converting redisDB to uint
 
 	return &Config{
-		ServerPort: viper.GetString("SERVER_PORT"),
+		ServerPort:           viper.GetString("SERVER_PORT"),
+		KeycloakURL:          viper.GetString("KEYCLOAK_URL"),
+		KeycloakRealm:        viper.GetString("KEYCLOAK_REALM"),
+		KeycloakClientID:     viper.GetString("KEYCLOAK_CLIENT_ID"),
+		KeycloakClientSecret: viper.GetString("KEYCLOAK_CLIENT_SECRET"),
 	}, nil
 }

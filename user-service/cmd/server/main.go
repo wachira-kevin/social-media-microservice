@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// Initialize services
-	userService := services.NewUserService(dbConn)
+	userService := services.NewUserService(dbConn, cfg)
 
 	// Initialize handlers
 	userHandler := handlers.NewUserHandler(userService)

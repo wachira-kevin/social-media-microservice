@@ -82,12 +82,12 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 }
 
 func (h *UserHandler) FollowUser(c *gin.Context) {
-	followerID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	followerID, err := strconv.ParseUint(c.Param("follower_id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
-	followeeID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	followeeID, err := strconv.ParseUint(c.Param("followee_id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return

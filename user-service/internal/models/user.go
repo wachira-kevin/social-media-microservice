@@ -57,6 +57,7 @@ type UserCreationSchema struct {
 	Gender      string `json:"gender" binding:"required,oneof=male female other"`
 	Location    string `json:"location" binding:"required"`
 	Username    string `json:"username" binding:"required,alphanum,min=3,max=20"`
+	Password    string `json:"password" binding:"required,alphanum,min=3,max=20"`
 	Email       string `json:"email" binding:"required,email"`
 }
 

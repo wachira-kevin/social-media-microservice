@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/user-service/config"
 	"github.com/user-service/internal/models"
 	"github.com/user-service/internal/repositories"
 	"github.com/user-service/pkg/utils"
@@ -19,8 +20,9 @@ type UserService interface {
 }
 
 type userService struct {
-	userRepository repositories.UserRepository
-	db             *gorm.DB
+	userRepository  repositories.UserRepository
+	keycloakService *KeycloakService
+	db              *gorm.DB
 }
 
 func (u userService) FollowUser(followerID uint, followeeID uint) error {
@@ -58,6 +60,11 @@ func (u userService) GetFollowing(userID uint) ([]models.User, error) {
 }
 
 func (u userService) CreateUser(userInput *models.UserCreationSchema) (*models.User, error) {
+	keycloakID, err := u.keycloakService.CreateUserInKeycloak(userInput)
+	if err != nil {
+		return nil, err
+	}
+
 	// parsing date
 	dob, err := utils.ParseDate(userInput.DateOfBirth)
 	if err != nil {
@@ -73,8 +80,9 @@ func (u userService) CreateUser(userInput *models.UserCreationSchema) (*models.U
 
 	// Create User
 	user := &models.User{
-		Username: userInput.Username,
-		Email:    userInput.Email,
+		KeycloakId: keycloakID,
+		Username:   userInput.Username,
+		Email:      userInput.Email,
 		Settings: models.UserSettings{
 			EmailNotifications: true,
 			PushNotifications:  false,
@@ -184,9 +192,10 @@ func (u userService) UpdateUser(userID uint, userInput *models.UserUpdateSchema)
 
 }
 
-func NewUserService(db *gorm.DB) UserService {
+func NewUserService(db *gorm.DB, cfg *config.Config) UserService {
 	return &userService{
-		userRepository: repositories.NewUserRepository(db),
-		db:             db,
+		userRepository:  repositories.NewUserRepository(db),
+		keycloakService: NewKeycloakService(cfg),
+		db:              db,
 	}
 }
