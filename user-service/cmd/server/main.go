@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/user-service/config"
 	"github.com/user-service/db"
+	"github.com/user-service/internal/broker"
+	"github.com/user-service/internal/cache"
 	"github.com/user-service/internal/handlers"
 	"github.com/user-service/internal/models"
 	"github.com/user-service/internal/routes"
@@ -17,13 +19,20 @@ func main() {
 		log.Fatalf("could not load config: %v", err)
 	}
 
+	// Initializing redis
+	cache.InitializeRedis(cfg)
+
+	// Initializing rabbitmq
+	_, err = broker.InitRabbitMQ(cfg)
+	if err != nil {
+		return
+	}
+
 	// Initializing postgres DB
 	dbConn, err := db.New(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("Could not connect to the database: %v", err)
 	}
-
-	// Auto migrate database models
 	if err := dbConn.AutoMigrate(
 		&models.User{}, &models.Profile{}, &models.UserFollower{}, &models.UserSettings{}); err != nil {
 		log.Fatalf("Error while trying to run auto migrations: %v", err)
