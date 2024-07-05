@@ -13,6 +13,8 @@ type UserRepository interface {
 	FollowUser(tx *gorm.DB, follow *models.UserFollower) error
 	GetFollowers(userID uint) ([]models.User, error)
 	GetFollowing(userID uint) ([]models.User, error)
+	DoesFollowExist(followerID uint, followeeID uint) (bool, error)
+	UserExists(username, email string) (bool, error)
 }
 
 type userRepository struct {
@@ -67,4 +69,21 @@ func (r *userRepository) GetFollowing(userID uint) ([]models.User, error) {
 		return nil, err
 	}
 	return followees, nil
+}
+
+func (r *userRepository) DoesFollowExist(followerID uint, followeeID uint) (bool, error) {
+	var count int64
+	if err := r.db.Model(&models.UserFollower{}).Where("follower_id = ? AND followee_id = ?",
+		followerID, followeeID).Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func (r *userRepository) UserExists(username, email string) (bool, error) {
+	var count int64
+	if err := r.db.Model(&models.User{}).Where("username = ? OR email = ?", username, email).Count(&count).Error; err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }
