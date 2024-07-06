@@ -1,10 +1,15 @@
 package services
 
 import (
+	"fmt"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/user-service/config"
 	"github.com/user-service/internal/models"
+	"github.com/user-service/internal/publishers"
 	"github.com/user-service/internal/repositories"
 	"github.com/user-service/pkg/utils"
 	"gorm.io/gorm"
+	"log"
 	"time"
 )
 
@@ -19,11 +24,32 @@ type UserService interface {
 }
 
 type userService struct {
-	userRepository repositories.UserRepository
-	db             *gorm.DB
+	userRepository  repositories.UserRepository
+	keycloakService *KeycloakService
+	conn            *amqp.Connection
+	db              *gorm.DB
 }
 
 func (u userService) FollowUser(followerID uint, followeeID uint) error {
+	// get follower and followee
+	follower, err := u.userRepository.FindByID(followerID)
+	if err != nil {
+		return err
+	}
+	followee, err := u.userRepository.FindByID(followeeID)
+	if err != nil {
+		return err
+	}
+
+	// Check if the user already follows the followee
+	exists, err := u.userRepository.DoesFollowExist(followerID, followeeID)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return fmt.Errorf("user %d already follows user %d", followerID, followeeID)
+	}
+
 	tx := u.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -46,6 +72,32 @@ func (u userService) FollowUser(followerID uint, followeeID uint) error {
 		return err
 	}
 
+	// adding follow notification to rabbit to be consumed by notification
+	if followee.Settings.PushNotifications {
+		notification := &models.NotificationSchema{
+			UserID:           followeeID,
+			NotificationType: "push",
+			MessageType:      "New Follower",
+			Message:          fmt.Sprintf("You have a new follower: %s", follower.Username),
+			Email:            followee.Email,
+		}
+		err := publishers.PublishFollowingMessage(notification, u.conn)
+		if err != nil {
+			log.Fatalf("Error publishing new follower message: %v", err)
+		}
+	} else {
+		notification := &models.NotificationSchema{
+			UserID:           followeeID,
+			NotificationType: "email",
+			MessageType:      "follow",
+			Message:          fmt.Sprintf("You have a new follower: %s", follower.Username),
+			Email:            followee.Email,
+		}
+		err := publishers.PublishFollowingMessage(notification, u.conn)
+		if err != nil {
+			log.Fatalf("Error publishing new follower message: %v", err)
+		}
+	}
 	return nil
 }
 
@@ -58,6 +110,21 @@ func (u userService) GetFollowing(userID uint) ([]models.User, error) {
 }
 
 func (u userService) CreateUser(userInput *models.UserCreationSchema) (*models.User, error) {
+	// check if user exists
+	userExists, err := u.userRepository.UserExists(userInput.Username, userInput.Email)
+	if err != nil {
+		return nil, err
+	}
+	if userExists {
+		return nil, fmt.Errorf("conflict")
+	}
+
+	// make request to keycloak
+	keycloakID, err := u.keycloakService.CreateUserInKeycloak(userInput)
+	if err != nil {
+		return nil, err
+	}
+
 	// parsing date
 	dob, err := utils.ParseDate(userInput.DateOfBirth)
 	if err != nil {
@@ -73,8 +140,9 @@ func (u userService) CreateUser(userInput *models.UserCreationSchema) (*models.U
 
 	// Create User
 	user := &models.User{
-		Username: userInput.Username,
-		Email:    userInput.Email,
+		KeycloakId: keycloakID,
+		Username:   userInput.Username,
+		Email:      userInput.Email,
 		Settings: models.UserSettings{
 			EmailNotifications: true,
 			PushNotifications:  false,
@@ -181,12 +249,13 @@ func (u userService) UpdateUser(userID uint, userInput *models.UserUpdateSchema)
 	}
 
 	return user, nil
-
 }
 
-func NewUserService(db *gorm.DB) UserService {
+func NewUserService(db *gorm.DB, cfg *config.Config, conn *amqp.Connection) UserService {
 	return &userService{
-		userRepository: repositories.NewUserRepository(db),
-		db:             db,
+		userRepository:  repositories.NewUserRepository(db),
+		keycloakService: NewKeycloakService(cfg),
+		conn:            conn,
+		db:              db,
 	}
 }

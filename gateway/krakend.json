@@ -14,6 +14,205 @@
 	"timeout": "30000ms",
 	"cache_ttl": "300s",
 	"port": 9090,
-	"endpoints": [],
-	"output_encoding": "json"
+	"output_encoding": "json",
+	"endpoints": [
+		{
+			"endpoint": "/api/v1/users",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/users",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://192.168.100.139:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/users/{id}",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/users/{id}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://192.168.100.139:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/users/{id}",
+			"method": "PUT",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/users/{id}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "PUT",
+					"host": ["http://192.168.100.139:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/users/{id}/following",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/users/{id}/following",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://192.168.100.139:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/users/{id}/followers",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://192.168.100.1391:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/users/{id}/followers",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://192.168.100.139:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/users/{follower_id}/follow/{followee_id}",
+			"method": "POST",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/users/{follower_id}/follow/{followee_id}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "POST",
+					"host": ["http://192.168.100.139:8086"],
+					"disable_host_sanitize": false
+				}	
+			]
+		},
+		{
+			"endpoint": "/api/v1/users",
+			"method": "POST",
+			"output_encoding": "no-op",
+			"backend": [
+				{
+					"url_pattern": "/users",
+					"encoding": "json",
+					"sd": "static",
+					"method": "POST",
+					"host": ["http://192.168.100.139:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/auth/login",
+			"method": "POST",
+			"output_encoding": "no-op",
+			"backend": [
+				{
+					"url_pattern": "/auth/login",
+					"encoding": "json",
+					"sd": "static",
+					"method": "POST",
+					"host": ["http://192.168.100.139:8087"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/notifications/events/{id}",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"backend": [
+				{
+					"url_pattern": "/notifications/events/{id}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://192.168.100.139:8088"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/auth/refresh",
+			"method": "POST",
+			"output_encoding": "no-op",
+			"backend": [
+				{
+					"url_pattern": "/auth/refresh",
+					"encoding": "json",
+					"sd": "static",
+					"method": "POST",
+					"host": ["http://192.168.100.139:8087"],
+					"disable_host_sanitize": false
+				}
+			]
+		}
+	]
 }

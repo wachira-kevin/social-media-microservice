@@ -25,8 +25,13 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 	user, err := h.userService.CreateUser(&userInput)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		if err.Error() == "conflict" {
+			c.JSON(http.StatusConflict, gin.H{"error": "User already exists"})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	c.JSON(http.StatusCreated, user)
@@ -82,12 +87,12 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 }
 
 func (h *UserHandler) FollowUser(c *gin.Context) {
-	followerID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	followerID, err := strconv.ParseUint(c.Param("follower_id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return
 	}
-	followeeID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	followeeID, err := strconv.ParseUint(c.Param("followee_id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
 		return

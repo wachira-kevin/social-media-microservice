@@ -14,7 +14,7 @@ type Model struct {
 
 type User struct {
 	gorm.Model
-	KeycloakId string       `json:"keycloak_id,omitempty"`
+	KeycloakId string       `gorm:"unique;not null" json:"keycloak_id,omitempty"`
 	Username   string       `gorm:"unique;not null" json:"username"`
 	Email      string       `gorm:"unique;not null" json:"email"`
 	LastLogin  *time.Time   `json:"last_login,omitempty"`
@@ -57,6 +57,7 @@ type UserCreationSchema struct {
 	Gender      string `json:"gender" binding:"required,oneof=male female other"`
 	Location    string `json:"location" binding:"required"`
 	Username    string `json:"username" binding:"required,alphanum,min=3,max=20"`
+	Password    string `json:"password" binding:"required,alphanum,min=3,max=20"`
 	Email       string `json:"email" binding:"required,email"`
 }
 
@@ -81,4 +82,12 @@ type UserUpdateSchema struct {
 	Username         string `json:"username" binding:"omitempty,alphanum,min=3,max=20"`
 	Email            string `json:"email" binding:"omitempty,email"`
 	NotificationType string `json:"notification_type" binding:"omitempty,oneof=sms email push"`
+}
+
+type NotificationSchema struct {
+	UserID           uint   `json:"user_id"`
+	MessageType      string `json:"message_type"`
+	NotificationType string `json:"notification_type"`
+	Message          string `json:"message"`
+	Email            string `json:"email"`
 }

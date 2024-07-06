@@ -23,9 +23,9 @@ func main() {
 	cache.InitializeRedis(cfg)
 
 	// Initializing rabbitmq
-	_, err = broker.InitRabbitMQ(cfg)
+	rabbitConn, err := broker.InitRabbitMQ(cfg)
 	if err != nil {
-		return
+		log.Fatalf("Could not connect to the rabbit: %v", err)
 	}
 
 	// Initializing postgres DB
@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// Initialize services
-	userService := services.NewUserService(dbConn)
+	userService := services.NewUserService(dbConn, cfg, rabbitConn)
 
 	// Initialize handlers
 	userHandler := handlers.NewUserHandler(userService)
