@@ -24,7 +24,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.143.251:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -34,7 +34,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "GET",
-					"host": ["http://192.168.143.251:8086"],
+					"host": ["http://192.168.100.139:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -47,7 +47,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.143.251:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -57,7 +57,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "GET",
-					"host": ["http://192.168.143.251:8086"],
+					"host": ["http://192.168.100.139:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -70,7 +70,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.143.251:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -80,7 +80,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "PUT",
-					"host": ["http://192.168.143.251:8086"],
+					"host": ["http://192.168.100.139:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -93,7 +93,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.143.251:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -103,7 +103,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "GET",
-					"host": ["http://192.168.143.251:8086"],
+					"host": ["http://192.168.100.139:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -116,7 +116,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.143.251:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://192.168.100.1391:9001/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -126,7 +126,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "GET",
-					"host": ["http://192.168.143.251:8086"],
+					"host": ["http://192.168.100.139:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -139,7 +139,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.143.251:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -149,9 +149,9 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "POST",
-					"host": ["http://192.168.143.251:8086"],
+					"host": ["http://192.168.100.139:8086"],
 					"disable_host_sanitize": false
-				}
+				}	
 			]
 		},
 		{
@@ -164,7 +164,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "POST",
-					"host": ["http://192.168.143.251:8086"],
+					"host": ["http://192.168.100.139:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -179,7 +179,22 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "POST",
-					"host": ["http://192.168.143.251:8087"],
+					"host": ["http://192.168.100.139:8087"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/notifications/events/{id}",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"backend": [
+				{
+					"url_pattern": "/notifications/events/{id}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://192.168.100.139:8088"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -194,7 +209,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "POST",
-					"host": ["http://192.168.143.251:8087"],
+					"host": ["http://192.168.100.139:8087"],
 					"disable_host_sanitize": false
 				}
 			]
