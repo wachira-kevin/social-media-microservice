@@ -79,6 +79,7 @@ func (u userService) FollowUser(followerID uint, followeeID uint) error {
 			NotificationType: "push",
 			MessageType:      "New Follower",
 			Message:          fmt.Sprintf("You have a new follower: %s", follower.Username),
+			Email:            followee.Email,
 		}
 		err := publishers.PublishFollowingMessage(notification, u.conn)
 		if err != nil {
