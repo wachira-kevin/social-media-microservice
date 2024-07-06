@@ -89,4 +89,5 @@ type NotificationSchema struct {
 	MessageType      string `json:"message_type"`
 	NotificationType string `json:"notification_type"`
 	Message          string `json:"message"`
+	Email            string `json:"email"`
 }
