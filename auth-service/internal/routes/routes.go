@@ -11,7 +11,7 @@ func SetupRouter(authHandler *handlers.AuthHandler) *gin.Engine {
 	auth := r.Group("/auth")
 	{
 		auth.POST("/login", authHandler.Login)
-		auth.POST("/logout/:sessionId", authHandler.Logout)
+		auth.DELETE("/logout/:sessionId", authHandler.Logout)
 		auth.POST("/refresh", authHandler.RefreshToken)
 	}
 
