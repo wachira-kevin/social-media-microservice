@@ -5,12 +5,13 @@ import (
 )
 
 type Config struct {
-	DatabaseURL   string
-	ServerPort    string
-	RedisAddr     string
-	RedisPassword string
-	RedisDB       int
-	RabbitMQURL   string
+	DatabaseURL    string
+	ServerPort     string
+	RedisAddr      string
+	RedisPassword  string
+	RedisDB        int
+	RabbitMQURL    string
+	UserServiceURL string
 }
 
 func LoadConfig() (*Config, error) {
@@ -20,13 +21,13 @@ func LoadConfig() (*Config, error) {
 	}
 
 	// converting redisDB to uint
-
 	return &Config{
-		DatabaseURL:   viper.GetString("DATABASE_URL"),
-		ServerPort:    viper.GetString("SERVER_PORT"),
-		RedisAddr:     viper.GetString("REDIS_ADDR"),
-		RedisPassword: viper.GetString("REDIS_PASSWORD"),
-		RedisDB:       viper.GetInt("REDIS_DB"),
-		RabbitMQURL:   viper.GetString("RABBITMQ_URL"),
+		DatabaseURL:    viper.GetString("DATABASE_URL"),
+		ServerPort:     viper.GetString("SERVER_PORT"),
+		RedisAddr:      viper.GetString("REDIS_ADDR"),
+		RedisPassword:  viper.GetString("REDIS_PASSWORD"),
+		RedisDB:        viper.GetInt("REDIS_DB"),
+		RabbitMQURL:    viper.GetString("RABBITMQ_URL"),
+		UserServiceURL: viper.GetString("USER_SERVICE_URL"),
 	}, nil
 }

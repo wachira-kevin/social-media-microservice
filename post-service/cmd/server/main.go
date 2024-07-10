@@ -24,7 +24,7 @@ func main() {
 	cache.InitializeRedis(cfg)
 
 	// Initializing rabbitmq
-	_, err = broker.InitRabbitMQ(cfg)
+	brokerConn, err := broker.InitRabbitMQ(cfg)
 	if err != nil {
 		log.Fatalf("Could not connect to the rabbit: %v", err)
 	}
@@ -41,7 +41,7 @@ func main() {
 
 	postRepository := repositories.NewPostRepository(dbConn)
 	postService := services.NewPostService(postRepository)
-	postHandler := handlers.NewPostHandler(postService)
+	postHandler := handlers.NewPostHandler(postService, brokerConn)
 	router := routers.SetupRouter(postHandler)
 
 	log.Printf("Starting server on port %s", cfg.ServerPort)
