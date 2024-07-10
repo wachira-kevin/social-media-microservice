@@ -10,8 +10,8 @@ func SetupRouter(postHandler *handlers.PostHandler) *gin.Engine {
 
 	postGroup := r.Group("/posts")
 	{
-		postGroup.POST("/", postHandler.CreatePost)
-		postGroup.GET("/", postHandler.GetAllPosts)
+		postGroup.POST("", postHandler.CreatePost)
+		postGroup.GET("", postHandler.GetAllPosts)
 		postGroup.PUT("/:id", postHandler.UpdatePost)
 		postGroup.GET("/:id", postHandler.GetPostByID)
 		postGroup.GET("/user/:user_id", postHandler.GetPostsByUserID)
