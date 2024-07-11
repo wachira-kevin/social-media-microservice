@@ -21,6 +21,7 @@ type UserService interface {
 	FollowUser(followerID uint, followeeID uint) error
 	GetFollowers(userID uint) ([]models.User, error)
 	GetFollowing(userID uint) ([]models.User, error)
+	UpdateUserSettings(userID uint, userInput *models.UserSettingsUpdateSchema) (*models.UserSettings, error)
 }
 
 type userService struct {
@@ -28,6 +29,35 @@ type userService struct {
 	keycloakService *KeycloakService
 	conn            *amqp.Connection
 	db              *gorm.DB
+}
+
+func (u userService) UpdateUserSettings(userID uint, userInput *models.UserSettingsUpdateSchema) (*models.UserSettings, error) {
+	settings, err := u.userRepository.GetUserSettingsByUserId(userID)
+	if err != nil {
+		return nil, err
+	}
+	if userInput.NotificationType != "" {
+		switch userInput.NotificationType {
+		case "email":
+			settings.EmailNotifications = true
+			settings.PushNotifications = false
+			settings.SmsNotifications = false
+		case "push":
+			settings.EmailNotifications = false
+			settings.PushNotifications = true
+			settings.SmsNotifications = false
+		case "sms":
+			settings.EmailNotifications = false
+			settings.PushNotifications = false
+			settings.SmsNotifications = true
+		}
+	}
+	updatedSettings, err := u.userRepository.UpdateSettings(settings)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedSettings, nil
 }
 
 func (u userService) FollowUser(followerID uint, followeeID uint) error {
@@ -77,7 +107,7 @@ func (u userService) FollowUser(followerID uint, followeeID uint) error {
 		notification := &models.NotificationSchema{
 			UserID:           followeeID,
 			NotificationType: "push",
-			MessageType:      "New Follower",
+			MessageType:      "follow",
 			Message:          fmt.Sprintf("You have a new follower: %s", follower.Username),
 			Email:            followee.Email,
 		}
@@ -221,22 +251,6 @@ func (u userService) UpdateUser(userID uint, userInput *models.UserUpdateSchema)
 	}
 	if userInput.Location != "" {
 		user.Profile.Location = userInput.Location
-	}
-	if userInput.NotificationType != "" {
-		switch userInput.NotificationType {
-		case "email":
-			user.Settings.EmailNotifications = true
-			user.Settings.PushNotifications = false
-			user.Settings.SmsNotifications = false
-		case "push":
-			user.Settings.EmailNotifications = false
-			user.Settings.PushNotifications = true
-			user.Settings.SmsNotifications = false
-		case "sms":
-			user.Settings.EmailNotifications = false
-			user.Settings.PushNotifications = false
-			user.Settings.SmsNotifications = true
-		}
 	}
 
 	if err := u.userRepository.UpdateUser(tx, user); err != nil {

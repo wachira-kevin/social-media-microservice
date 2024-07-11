@@ -10,12 +10,13 @@ func SetupRouter(postHandler *handlers.PostHandler) *gin.Engine {
 
 	postGroup := r.Group("/posts")
 	{
-		postGroup.POST("/", postHandler.CreatePost)
-		postGroup.PUT("/", postHandler.UpdatePost)
+		postGroup.POST("", postHandler.CreatePost)
+		postGroup.GET("", postHandler.GetAllPosts)
+		postGroup.PUT("/:id", postHandler.UpdatePost)
 		postGroup.GET("/:id", postHandler.GetPostByID)
 		postGroup.GET("/user/:user_id", postHandler.GetPostsByUserID)
 		postGroup.POST("/:post_id/like/:user_id", postHandler.LikePost)
-		postGroup.POST("/comment", postHandler.CommentOnPost)
+		postGroup.POST("/:post_id/comment", postHandler.CommentOnPost)
 	}
 
 	return r

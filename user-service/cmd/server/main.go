@@ -5,6 +5,7 @@ import (
 	"github.com/user-service/db"
 	"github.com/user-service/internal/broker"
 	"github.com/user-service/internal/cache"
+	"github.com/user-service/internal/consumers"
 	"github.com/user-service/internal/handlers"
 	"github.com/user-service/internal/models"
 	"github.com/user-service/internal/routes"
@@ -43,6 +44,11 @@ func main() {
 
 	// Initialize handlers
 	userHandler := handlers.NewUserHandler(userService)
+
+	// consumer for post events
+	go consumers.HandleCreateCommentNotification(userService)
+	go consumers.HandleCreatePostNotification(userService)
+	go consumers.HandleCreateLikeNotification(userService)
 
 	// Setup routes
 	router := routes.SetupRouter(userHandler)

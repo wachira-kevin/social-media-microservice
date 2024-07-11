@@ -7,7 +7,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-var rabbitConn *amqp.Connection
+var RabbitConn *amqp.Connection
 
 func InitRabbitMQ(cfg *config.Config) (*amqp.Connection, error) {
 
@@ -16,6 +16,6 @@ func InitRabbitMQ(cfg *config.Config) (*amqp.Connection, error) {
 		return nil, fmt.Errorf("could not connect to RabbitMQ: %w", err)
 	}
 
-	rabbitConn = conn
-	return rabbitConn, nil
+	RabbitConn = conn
+	return RabbitConn, nil
 }

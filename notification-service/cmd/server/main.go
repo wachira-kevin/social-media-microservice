@@ -10,7 +10,6 @@ import (
 	"notification-service/internal/models"
 	"notification-service/internal/routes"
 	"notification-service/internal/services"
-	"notification-service/internal/smtp"
 )
 
 func main() {
@@ -44,12 +43,7 @@ func main() {
 	go services.ConsumeFollowNotificationMessages(cfg, dbConn, handlers.Broker)
 	go services.ConsumePostNotificationMessages(cfg, dbConn, handlers.Broker)
 	go services.ConsumeLikeNotificationMessages(cfg, dbConn, handlers.Broker)
-
-	email := smtp.NewEmailSender(cfg)
-	err = email.SendEmail("williambosco06@gmail.com", "Test", "test")
-	if err != nil {
-		return
-	}
+	go services.ConsumeCommentNotificationMessages(cfg, dbConn, handlers.Broker)
 
 	router := routes.SetupRouter(dbConn)
 

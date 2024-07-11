@@ -10,7 +10,9 @@ type PostService struct {
 }
 
 func NewPostService(postRepository repositories.PostRepository) *PostService {
-	return &PostService{PostRepository: postRepository}
+	return &PostService{
+		PostRepository: postRepository,
+	}
 }
 
 func (s *PostService) CreatePost(post *models.Post) error {
@@ -27,6 +29,10 @@ func (s *PostService) GetPostByID(id uint) (*models.Post, error) {
 
 func (s *PostService) GetPostsByUserID(userID uint) ([]models.Post, error) {
 	return s.PostRepository.GetPostsByUserID(userID)
+}
+
+func (s *PostService) GetAllPosts() ([]models.Post, error) {
+	return s.PostRepository.GetPosts()
 }
 
 func (s *PostService) LikePost(postID, userID uint) error {

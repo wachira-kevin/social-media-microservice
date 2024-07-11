@@ -10,12 +10,21 @@ type PostRepository interface {
 	UpdatePost(post *models.Post) error
 	GetPostByID(id uint) (*models.Post, error)
 	GetPostsByUserID(userID uint) ([]models.Post, error)
+	GetPosts() ([]models.Post, error)
 	LikePost(like *models.Like) error
 	CommentOnPost(comment *models.Comment) error
 }
 
 type postRepository struct {
 	db *gorm.DB
+}
+
+func (r *postRepository) GetPosts() ([]models.Post, error) {
+	var posts []models.Post
+	if err := r.db.Preload("Comments").Preload("Likes").Find(&posts).Error; err != nil {
+		return nil, err
+	}
+	return posts, nil
 }
 
 func NewPostRepository(db *gorm.DB) PostRepository {

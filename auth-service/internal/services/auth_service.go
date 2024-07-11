@@ -3,6 +3,7 @@ package services
 import (
 	"auth-service/config"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -26,11 +27,30 @@ func (ks *KeycloakService) Login(username, password string) (map[string]interfac
 }
 
 func (ks *KeycloakService) Logout(sessionId string) error {
-	url := fmt.Sprintf("%s/realms/%s/protocol/openid-connect/logout", ks.Config.KeycloakURL, ks.Config.KeycloakRealm)
-	data := fmt.Sprintf("client_id=%s&refresh_token=%s&client_secret=%s",
-		ks.Config.KeycloakClientID, sessionId, ks.Config.KeycloakClientSecret)
-	_, err := ks.postRequest(url, data)
-	return err
+	url := fmt.Sprintf("%s/admin/realms/%s/sessions/%s", ks.Config.KeycloakURL, ks.Config.KeycloakRealm, sessionId)
+
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Bearer "+ks.getAccessToken())
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+		}
+	}(resp.Body)
+
+	if resp.StatusCode != http.StatusNoContent {
+		return errors.New("failed to logout of session")
+	}
+	return nil
 }
 
 func (ks *KeycloakService) RefreshToken(refreshToken string) (map[string]interface{}, error) {
@@ -74,4 +94,40 @@ func (ks *KeycloakService) postRequest(url string, data string) (map[string]inte
 	}
 
 	return result, nil
+}
+
+func (ks *KeycloakService) getAccessToken() string {
+	url := fmt.Sprintf("%s/realms/%s/protocol/openid-connect/token", ks.Config.KeycloakURL, ks.Config.KeycloakRealm)
+	data := fmt.Sprintf("client_id=%s&client_secret=%s&grant_type=client_credentials",
+		ks.Config.KeycloakClientID, ks.Config.KeycloakClientSecret)
+
+	req, err := http.NewRequest("POST", url, strings.NewReader(data))
+	if err != nil {
+		return ""
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return ""
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+		}
+	}(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return ""
+	}
+
+	var result map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return ""
+	}
+
+	return result["access_token"].(string)
 }

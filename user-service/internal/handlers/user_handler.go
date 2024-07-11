@@ -33,7 +33,6 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 			return
 		}
 	}
-
 	c.JSON(http.StatusCreated, user)
 }
 
@@ -103,7 +102,6 @@ func (h *UserHandler) FollowUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.Status(http.StatusNoContent)
 }
 
@@ -119,7 +117,6 @@ func (h *UserHandler) GetFollowers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, followers)
 }
 
@@ -135,6 +132,31 @@ func (h *UserHandler) GetFollowing(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, following)
+}
+
+func (h *UserHandler) UpdateUserSettings(c *gin.Context) {
+	// parse parameter to uint
+	userID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+	var userUpdate models.UserSettingsUpdateSchema
+	if err := c.ShouldBindJSON(&userUpdate); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	_, err = h.userService.GetUserByID(uint(userID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	settings, err := h.userService.UpdateUserSettings(uint(userID), &userUpdate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, settings)
 }

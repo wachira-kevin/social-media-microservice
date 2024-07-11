@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
-	"github.com/user-service/internal/models"
 	"log"
+	"post-service/internal/models"
 )
 
 func getChannel(conn *amqp.Connection) (*amqp.Channel, error) {
@@ -34,7 +34,7 @@ func declareQueue(ch *amqp.Channel, queueName string) (amqp.Queue, error) {
 	return q, nil
 }
 
-func publishMessage(schema *models.NotificationSchema, queueName string, conn *amqp.Connection) error {
+func publishMessage(event interface{}, queueName string, conn *amqp.Connection) error {
 	ch, err := getChannel(conn)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func publishMessage(schema *models.NotificationSchema, queueName string, conn *a
 		return err
 	}
 
-	jsonBody, err := json.Marshal(schema)
+	jsonBody, err := json.Marshal(event)
 	if err != nil {
 		return fmt.Errorf("failed to serialize message to JSON: %w", err)
 	}
@@ -64,22 +64,18 @@ func publishMessage(schema *models.NotificationSchema, queueName string, conn *a
 		return fmt.Errorf("failed to publish a message: %w", err)
 	}
 
-	log.Printf("Published %s message for user %d successfully", queueName, schema.UserID)
+	log.Printf("Published %s message successfully", queueName)
 	return nil
 }
 
-func PublishFollowingMessage(schema *models.NotificationSchema, conn *amqp.Connection) error {
-	return publishMessage(schema, "SendNewFollowerNotification", conn)
+func PublishNewPostMessage(event *models.CreatePostNotificationEvent, conn *amqp.Connection) error {
+	return publishMessage(event, "CreatePostCreationNotification", conn)
 }
 
-func PublishPostMessage(schema *models.NotificationSchema, conn *amqp.Connection) error {
-	return publishMessage(schema, "SendNewPostNotification", conn)
+func PublishNewLikeMessage(event *models.CreateLikeNotificationEvent, conn *amqp.Connection) error {
+	return publishMessage(event, "CreateLikeNotification", conn)
 }
 
-func PublishLikeMessage(schema *models.NotificationSchema, conn *amqp.Connection) error {
-	return publishMessage(schema, "SendNewLikeNotification", conn)
-}
-
-func PublishCommentMessage(schema *models.NotificationSchema, conn *amqp.Connection) error {
-	return publishMessage(schema, "SendNewCommentNotification", conn)
+func PublishNewCommentMessage(event *models.CreateCommentNotificationEvent, conn *amqp.Connection) error {
+	return publishMessage(event, "CreateCommentNotification", conn)
 }
