@@ -4,11 +4,70 @@
 	"name": "CLUSTER GATEWAY",
 	"extra_config": {
 		"security/cors": {
-			"allow_origins": ["*"],
-			"allow_headers": ["*"],
-			"expose_headers": ["Content-Length", "Content-Type"],
+			"allow_origins": [
+				"*"
+			],
+			"allow_headers": [
+				"*"
+			],
+			"expose_headers": [
+				"Content-Length",
+				"Content-Type"
+			],
 			"max_age": "12h",
-			"allow_methods": ["GET", "HEAD", "POST", "PUT", "DELETE"]
+			"allow_methods": [
+				"GET",
+				"HEAD",
+				"POST",
+				"PUT",
+				"DELETE"
+			]
+		},
+		"telemetry/opentelemetry": {
+			"service_name": "gateway",
+			"metric_reporting_period": 30,
+			"trace_sample_rate": 0.15,
+			"layers": {
+				"global": {
+					"report_headers": true
+				},
+				"proxy": {
+					"report_headers": true
+				},
+				"backend": {
+					"metrics": {
+						"disable_stage": true
+					},
+					"traces": {
+						"disable_stage": false,
+						"round_trip": true,
+						"read_payload": true,
+						"detailed_connection": true,
+						"report_headers": true
+					}
+				}
+			},
+			"exporters": {
+				"otlp": [
+					{
+						"name": "jager",
+						"host": "jaeger-collector.development-apps",
+						"port": 4317,
+						"use_http": false,
+						"disable_metrics": false
+					}
+				],
+				"prometheus": [
+					{
+						"name": "prometheus-server",
+						"host": "prometheus-server.default",
+						"port": 80,
+						"listen_ip": "::1",
+						"process_metrics": true,
+						"go_metrics": true
+					}
+				]
+			}
 		}
 	},
 	"timeout": "30000ms",
@@ -24,7 +83,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -34,7 +93,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "GET",
-					"host": ["http://192.168.100.139:8086"],
+					"host": ["http://user-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -47,7 +106,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -57,7 +116,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "GET",
-					"host": ["http://192.168.100.139:8086"],
+					"host": ["http://user-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -70,7 +129,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -80,7 +139,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "PUT",
-					"host": ["http://192.168.100.139:8086"],
+					"host": ["http://user-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -93,7 +152,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -103,7 +162,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "GET",
-					"host": ["http://192.168.100.139:8086"],
+					"host": ["http://user-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -116,7 +175,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.100.1391:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -126,7 +185,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "GET",
-					"host": ["http://192.168.100.139:8086"],
+					"host": ["http://user-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -139,7 +198,7 @@
 				"auth/validator": {
 					"alg": "RS256",
 					"cache": true,
-					"jwk_url": "http://192.168.100.139:9001/realms/Bondnet/protocol/openid-connect/certs",
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
 					"disable_jwk_security": true
 				}
 			},
@@ -149,9 +208,9 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "POST",
-					"host": ["http://192.168.100.139:8086"],
+					"host": ["http://user-service:8086"],
 					"disable_host_sanitize": false
-				}	
+				}
 			]
 		},
 		{
@@ -164,7 +223,7 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "POST",
-					"host": ["http://192.168.100.139:8086"],
+					"host": ["http://user-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -179,22 +238,30 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "POST",
-					"host": ["http://192.168.100.139:8087"],
+					"host": ["http://auth-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
 		},
 		{
-			"endpoint": "/api/v1/notifications/events/{id}",
-			"method": "GET",
+			"endpoint": "/api/v1/auth/logout/{sessionId}",
+			"method": "DELETE",
 			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
 			"backend": [
 				{
-					"url_pattern": "/notifications/events/{id}",
+					"url_pattern": "/auth/logout/{sessionId}",
 					"encoding": "json",
 					"sd": "static",
-					"method": "GET",
-					"host": ["http://192.168.100.139:8088"],
+					"method": "DELETE",
+					"host": ["http://auth-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
@@ -209,7 +276,207 @@
 					"encoding": "json",
 					"sd": "static",
 					"method": "POST",
-					"host": ["http://192.168.100.139:8087"],
+					"host": ["http://auth-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/notifications/events/{id}",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"input_headers": ["*"],
+			"backend": [
+				{
+					"url_pattern": "/notifications/events/{id}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://notification-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/notifications/{userId}",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/notifications/{userId}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://notification-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/posts",
+			"method": "POST",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/posts",
+					"encoding": "json",
+					"sd": "static",
+					"method": "POST",
+					"host": ["http://post-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/posts/{postId}",
+			"method": "PUT",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/posts/{postId}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "PUT",
+					"host": ["http://post-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/posts/{postId}",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/posts/{postId}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://post-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/posts",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/posts",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://post-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/posts/{postId}/like/{userId}",
+			"method": "POST",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/posts/{postId}/like/{userId}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "POST",
+					"host": ["http://post-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/posts/user/{userId}",
+			"method": "GET",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/posts/user/{userId}",
+					"encoding": "json",
+					"sd": "static",
+					"method": "GET",
+					"host": ["http://post-service:8086"],
+					"disable_host_sanitize": false
+				}
+			]
+		},
+		{
+			"endpoint": "/api/v1/posts/{postId}/comment",
+			"method": "POST",
+			"output_encoding": "no-op",
+			"extra_config": {
+				"auth/validator": {
+					"alg": "RS256",
+					"cache": true,
+					"jwk_url": "http://keycloak-service/realms/Bondnet/protocol/openid-connect/certs",
+					"disable_jwk_security": true
+				}
+			},
+			"backend": [
+				{
+					"url_pattern": "/posts/{postId}/comment",
+					"encoding": "json",
+					"sd": "static",
+					"method": "POST",
+					"host": ["http://post-service:8086"],
 					"disable_host_sanitize": false
 				}
 			]
