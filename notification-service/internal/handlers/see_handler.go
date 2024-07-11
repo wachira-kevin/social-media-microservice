@@ -14,7 +14,7 @@ func InitSSEHandler() {
 }
 
 func SSEHandler(c *gin.Context) {
-	clientID := c.Param("clientID")
+	clientID := c.Param("id")
 
 	// Create a new channel for this client
 	clientChan := make(chan string)
@@ -22,10 +22,17 @@ func SSEHandler(c *gin.Context) {
 	// Add the client to the broker
 	Broker.AddClient(clientID, clientChan)
 
+	// Add CORS headers
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*") // Update with your frontend URL
+	c.Writer.Header().Set("Access-Control-Allow-Methods", "GET")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+
 	// Set headers for SSE
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
 	c.Writer.Header().Set("Cache-Control", "no-cache")
 	c.Writer.Header().Set("Connection", "keep-alive")
+	c.Writer.Header().Set("Transfer-Encoding", "chunked")
 
 	// Close the connection when done
 	defer func() {

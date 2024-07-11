@@ -117,9 +117,9 @@ func consumeMessages(db *gorm.DB, queueName string, handler func(models.Notifica
 	<-forever
 }
 
-// ConsumeFollowNotificationMessages consumes messages from the "new_follower" queue.
+// ConsumeFollowNotificationMessages consumes messages from the "SendNewFollowerNotification" queue.
 func ConsumeFollowNotificationMessages(cfg *config.Config, db *gorm.DB, broker *sse.Broker) {
-	consumeMessages(db, "new_follower", func(message models.NotificationSchema) error {
+	consumeMessages(db, "SendNewFollowerNotification", func(message models.NotificationSchema) error {
 		if message.NotificationType == "email" {
 			emailSender := smtp.NewEmailSender(cfg)
 			log.Println("sending email...")
@@ -131,9 +131,9 @@ func ConsumeFollowNotificationMessages(cfg *config.Config, db *gorm.DB, broker *
 	})
 }
 
-// ConsumeLikeNotificationMessages consumes messages from the "new_like" queue.
+// ConsumeLikeNotificationMessages consumes messages from the "SendNewLikeNotification" queue.
 func ConsumeLikeNotificationMessages(cfg *config.Config, db *gorm.DB, broker *sse.Broker) {
-	consumeMessages(db, "new_like", func(message models.NotificationSchema) error {
+	consumeMessages(db, "SendNewLikeNotification", func(message models.NotificationSchema) error {
 		if message.NotificationType == "email" {
 			emailSender := smtp.NewEmailSender(cfg)
 			return emailSender.SendEmail(message.Email, "New Like Notification", message.Message)
@@ -144,9 +144,22 @@ func ConsumeLikeNotificationMessages(cfg *config.Config, db *gorm.DB, broker *ss
 	})
 }
 
-// ConsumePostNotificationMessages consumes messages from the "new_post" queue.
+// ConsumePostNotificationMessages consumes messages from the "SendNewPostNotification" queue.
 func ConsumePostNotificationMessages(cfg *config.Config, db *gorm.DB, broker *sse.Broker) {
-	consumeMessages(db, "new_post", func(message models.NotificationSchema) error {
+	consumeMessages(db, "SendNewPostNotification", func(message models.NotificationSchema) error {
+		if message.NotificationType == "email" {
+			emailSender := smtp.NewEmailSender(cfg)
+			return emailSender.SendEmail(message.Email, "New Post Notification", message.Message)
+		} else if message.NotificationType == "push" {
+			return broker.SendMessageToClient(strconv.Itoa(int(message.UserID)), message.Message)
+		}
+		return nil
+	})
+}
+
+// ConsumeCommentNotificationMessages consumes messages from the "SendNewCommentNotification" queue.
+func ConsumeCommentNotificationMessages(cfg *config.Config, db *gorm.DB, broker *sse.Broker) {
+	consumeMessages(db, "SendNewCommentNotification", func(message models.NotificationSchema) error {
 		if message.NotificationType == "email" {
 			emailSender := smtp.NewEmailSender(cfg)
 			return emailSender.SendEmail(message.Email, "New Post Notification", message.Message)

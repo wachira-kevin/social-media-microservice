@@ -15,8 +15,8 @@ type Model struct {
 type Notification struct {
 	gorm.Model
 	UserID           uint   `gorm:"not null" json:"user_id"`
-	MessageType      string `gorm:"not null;type:message_type" json:"message_type"`
-	NotificationType string `gorm:"not null;notification_type" json:"notification_type"`
+	MessageType      string `gorm:"not null" json:"message_type"`
+	NotificationType string `gorm:"not null" json:"notification_type"`
 	Message          string `gorm:"not null" json:"message"`
 	Status           string `gorm:"not null" json:"status"`
 }
