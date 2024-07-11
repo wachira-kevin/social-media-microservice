@@ -57,30 +57,22 @@ type UserCreationSchema struct {
 	Gender      string `json:"gender" binding:"required,oneof=male female other"`
 	Location    string `json:"location" binding:"required"`
 	Username    string `json:"username" binding:"required,alphanum,min=3,max=20"`
-	Password    string `json:"password" binding:"required,alphanum,min=3,max=20"`
+	Password    string `json:"password" binding:"required,min=3,max=20"`
 	Email       string `json:"email" binding:"required,email"`
 }
 
-type UserCreationSchemaWithProperDate struct {
-	FirstName   string     `json:"first_name" binding:"required,alpha"`
-	LastName    string     `json:"last_name" binding:"required,alpha"`
-	Bio         string     `json:"bio" binding:"omitempty,max=250"`
-	DateOfBirth *time.Time `json:"date_of_birth" binding:"required"`
-	Gender      string     `json:"gender" binding:"required,oneof=male female other"`
-	Location    string     `json:"location" binding:"required"`
-	Username    string     `json:"username" binding:"required,alphanum,min=3,max=20"`
-	Email       string     `json:"email" binding:"required,email"`
+type UserUpdateSchema struct {
+	FirstName   string `json:"first_name" binding:"omitempty,alpha"`
+	LastName    string `json:"last_name" binding:"omitempty,alpha"`
+	Bio         string `json:"bio" binding:"omitempty,max=250"`
+	DateOfBirth string `json:"date_of_birth" binding:"omitempty"`
+	Gender      string `json:"gender" binding:"omitempty,oneof=male female other"`
+	Location    string `json:"location" binding:"omitempty"`
+	Username    string `json:"username" binding:"omitempty,alphanum,min=3,max=20"`
+	Email       string `json:"email" binding:"omitempty,email"`
 }
 
-type UserUpdateSchema struct {
-	FirstName        string `json:"first_name" binding:"omitempty,alpha"`
-	LastName         string `json:"last_name" binding:"omitempty,alpha"`
-	Bio              string `json:"bio" binding:"omitempty,max=250"`
-	DateOfBirth      string `json:"date_of_birth" binding:"omitempty"`
-	Gender           string `json:"gender" binding:"omitempty,oneof=male female other"`
-	Location         string `json:"location" binding:"omitempty"`
-	Username         string `json:"username" binding:"omitempty,alphanum,min=3,max=20"`
-	Email            string `json:"email" binding:"omitempty,email"`
+type UserSettingsUpdateSchema struct {
 	NotificationType string `json:"notification_type" binding:"omitempty,oneof=sms email push"`
 }
 

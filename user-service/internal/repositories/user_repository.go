@@ -10,10 +10,12 @@ type UserRepository interface {
 	FindByID(id uint) (*models.User, error)
 	FindAll() ([]models.User, error)
 	UpdateUser(tx *gorm.DB, user *models.User) error
+	UpdateSettings(userSettings *models.UserSettings) (*models.UserSettings, error)
 	FollowUser(tx *gorm.DB, follow *models.UserFollower) error
 	GetFollowers(userID uint) ([]models.User, error)
 	GetFollowing(userID uint) ([]models.User, error)
 	DoesFollowExist(followerID uint, followeeID uint) (bool, error)
+	GetUserSettingsByUserId(userId uint) (*models.UserSettings, error)
 	UserExists(username, email string) (bool, error)
 }
 
@@ -86,4 +88,22 @@ func (r *userRepository) UserExists(username, email string) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func (r *userRepository) GetUserSettingsByUserId(userId uint) (*models.UserSettings, error) {
+	var userSettings models.UserSettings
+	if err := r.db.Model(&models.UserSettings{}).Where("user_id = ?", userId).First(&userSettings).Error; err != nil {
+		return nil, err
+	}
+	return &userSettings, nil
+}
+
+func (r *userRepository) UpdateSettings(userSettings *models.UserSettings) (*models.UserSettings, error) {
+	// Use GORM's Save method to update the record
+	if err := r.db.Save(userSettings).Error; err != nil {
+		// Return nil and the error if the update fails
+		return nil, err
+	}
+	// Return the updated user settings
+	return userSettings, nil
 }
